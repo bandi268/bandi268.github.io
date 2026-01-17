@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BANDI268 | Narrative Art Portfolio</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Helvetica Neue',Arial,sans-serif;scroll-behavior:smooth;overflow-x:hidden;background:#fff;}
+
+        /* 顶部导航栏 - 科技简约风，固定置顶 */
+        .navbar{position:fixed;top:0;left:0;width:100%;height:80px;background:rgba(255,255,255,0.95);z-index:999;display:flex;align-items:center;justify-content:space-between;padding:0 5%;box-shadow:0 2px 10px rgba(0,0,0,0.05);}
+        .navbar-logo{font-size:22px;color:#222;letter-spacing:2px;font-weight:400;}
+        .navbar-menu{display:flex;gap:30px;}
+        .navbar-menu a{text-decoration:none;color:#555;letter-spacing:1px;font-size:14px;transition:color 0.3s ease;}
+        .navbar-menu a:hover{color:#2c3e50;}
+
+        /* 核心：滚轮往复渐变（滚到出现，滚走消失，滚回再出现） */
+        .scroll-toggle{opacity:0;transform:translateY(60px);transition:all 1.2s cubic-bezier(0.4,0,0.2,1);}
+        .fade-left{transform:translateX(-60px);}
+        .fade-right{transform:translateX(60px);}
+        .fade-scale{transform:scale(0.9);}
+        /* 激活状态：渐变出现 */
+        .scroll-toggle.active{opacity:1;transform:translate(0);}
+        .fade-scale.active{opacity:1;transform:scale(1);}
+
+        /* 顶部封面区（预留导航栏高度） */
+        .hero-section{width:100%;height:100vh;display:flex;align-items:center;justify-content:center;padding:0 5%;background:#fafafa;position:relative;margin-top:80px;}
+        .hero-content{text-align:center;z-index:2;}
+        .hero-content h1{font-size:48px;color:#222;letter-spacing:2px;margin-bottom:20px;}
+        .hero-content p{font-size:18px;color:#666;max-width:800px;margin:0 auto;line-height:1.8;}
+        .dot-decor{position:absolute;top:20%;right:10%;width:12px;height:12px;background:#e0e0e0;border-radius:50%;}
+        .dot-decor:nth-child(2){top:40%;left:8%;width:8px;height:8px;}
+        .dot-decor:nth-child(3){bottom:30%;right:15%;width:10px;height:10px;}
+
+        /* 全屏大图区块（欧洲景区风核心） */
+        .full-img-section{width:100%;height:100vh;background-position:center;background-size:cover;background-attachment:fixed;display:flex;align-items:center;justify-content:center;position:relative;}
+        .section-mask{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.45);z-index:1;}
+        .text-container{position:relative;z-index:2;text-align:center;padding:0 5%;max-width:900px;color:#fff;}
+        .text-container h2{font-size:28px;font-weight:400;letter-spacing:3px;margin-bottom:18px;}
+        .text-container p{font-size:16px;letter-spacing:1.5px;line-height:1.8;opacity:0.9;}
+
+        /* 内嵌文字作品区 */
+        .work-section{width:100%;min-height:90vh;display:flex;align-items:center;padding:80px 5%;background:#fff;}
+        .work-left{width:55%;padding-right:5%;}
+        .work-right{width:45%;}
+        .work-reverse{flex-direction:row-reverse;}
+        .work-reverse .work-left{padding-right:0;padding-left:5%;}
+        .work-title{font-size:32px;color:#333;margin-bottom:30px;position:relative;}
+        .work-title::after{content:'';display:block;width:60px;height:3px;background:#2c3e50;margin-top:10px;}
+        .work-desc{font-size:16px;color:#555;line-height:2.0;margin-bottom:25px;}
+        .work-tag{display:inline-block;padding:8px 18px;background:#f5f5f5;color:#444;border-radius:30px;margin-right:12px;margin-bottom:15px;font-size:14px;}
+        .work-img{width:100%;height:400px;border-radius:8px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.08);background:#f8f8f8;display:flex;align-items:center;justify-content:center;}
+        .work-img img{width:100%;height:100%;object-fit:cover;opacity:0.8;transition:opacity 0.5s ease;}
+        .work-img:hover img{opacity:1;}
+
+        /* 留白过渡区 */
+        .space-section{width:100%;height:30vh;background:#fafafa;}
+        .space-gap{width:100%;height:40vh;background:#000;}
+
+        /* 底部全黑联系区：同样往复渐变（滚到出现，滚走消失） */
+        .footer-contact{width:100%;height:100vh;background:#000;display:flex;align-items:center;justify-content:center;position:relative;}
+        .contact-text{text-align:center;opacity:0;transform:translateY(40px);transition:opacity 2.5s ease-out, transform 2.5s ease-out;letter-spacing:2px;color:#fff;}
+        .contact-text.active{opacity:1;transform:translateY(0);}
+        .contact-text h3{font-size:24px;font-weight:300;margin-bottom:25px;}
+        .contact-text p{font-size:16px;margin:8px 0;opacity:0.85;}
+
+        /* 双端适配 */
+        @media (max-width:1024px){
+            .navbar{height:70px;}
+            .hero-section{margin-top:70px;}
+            .hero-content h1{font-size:38px;}
+            .work-section{flex-direction:column;min-height:auto;padding:60px 5%;}
+            .work-left, .work-right{width:100%;padding:0 !important;margin-bottom:30px;}
+            .work-img{height:300px;}
+            .work-title{font-size:28px;}
+            .navbar-menu{gap:20px;}
+        }
+        @media (max-width:768px){
+            .navbar{height:60px;}
+            .hero-section{margin-top:60px;}
+            .hero-content h1{font-size:32px;}
+            .hero-content p{font-size:16px;}
+            .text-container h2{font-size:18px;}
+            .text-container p{font-size:12px;}
+            .work-title{font-size:24px;}
+            .work-desc{font-size:14px;}
+            .contact-text h3{font-size:18px;}
+            .contact-text p{font-size:12px;}
+            .full-img-section{background-attachment:scroll;}
+            .navbar-menu{gap:15px;}
+            .navbar-menu a{font-size:12px;}
+            .navbar-logo{font-size:18px;}
+        }
+
+        /* 各区块大图背景（替换为自己的作品图） */
+        .section1{background-image:url(https://s41.ax1x.com/2026/01/18/pZyAcsx.jpg);}
+        .section2{background-image:url(https://s41.ax1x.com/2026/01/18/pZyVOPg.jpg);}
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏（新增） -->
+    <nav class="navbar">
+        <div class="navbar-logo">BANDI268 ART</div>
+        <div class="navbar-menu">
+            <a href="#hero">HOME</a>
+            <a href="#work1">WORK 01</a>
+            <a href="#work2">WORK 02</a>
+            <a href="#contact">CONTACT</a>
+        </div>
+    </nav>
+
+    <!-- 顶部封面区 -->
+    <section class="hero-section" id="hero">
+        <div class="dot-decor"></div>
+        <div class="dot-decor"></div>
+        <div class="dot-decor"></div>
+        <div class="hero-content scroll-toggle">
+            <h1>BANDI's Exquisite Art Portfolio</h1>
+ 	    <h1>作品</h1>
+            <p>聚焦动画与视觉设计，探索创作与社交的边界，用镜头与色彩传递世界观</p>
+	    <p>Focus on animation and visual design, explore the boundaries between creation and social interaction, and convey worldviews through lenses and colors.</p>
+        </div>
+    </section>
+
+    <!-- 全屏大图区1 -->
+    <section class="full-img-section section1">
+        <div class="section-mask"></div>
+        <div class="text-container scroll-toggle">
+            <h2>BANDI PORTFOLIO</h2>
+            <p>ANCIENT CHINESE STYLE ART & ILLUSTRATION</p>
+        </div>
+    </section>
+
+    <!-- 内嵌文字作品区1 -->
+    <section class="work-section" id="work1">
+        <div class="work-left scroll-toggle">
+            <h2 class="work-title">个人动画短片 · 全流程创作</h2>
+            <p class="work-desc">以练习和探索为目的，尝试构建完整的世界观，从分镜脚本到原画绘制、动态分镜，全程用CSP软件打磨画面质感，强化镜头叙事节奏与沉浸感。</p>
+            <span class="work-tag">CSP制作</span>
+            <span class="work-tag">自由题材</span>
+            <span class="work-tag">全流程</span>
+        </div>
+        <div class="work-right scroll-toggle fade-left">
+            <div class="work-img">
+                <img src="https://s41.ax1x.com/2026/01/18/pZyVIKI.png" alt="科幻动画短片封面">
+            </div>
+        </div>
+    </section>
+
+    <!-- 留白过渡 -->
+    <section class="space-section"></section>
+
+    <!-- 全屏大图区2 -->
+    <section class="full-img-section section2">
+        <div class="section-mask"></div>
+        <div class="text-container scroll-toggle fade-right">
+            <h2>CHARACTER & SCENE DESIGN</h2>
+            <p>TECHNOLOGY STYLE · DETAIL PERFECTION · WORLDVIEW ADAPTATION</p>
+        </div>
+    </section>
+
+    <!-- 内嵌文字作品区2 -->
+    <section class="work-section work-reverse" id="work2">
+        <div class="work-left scroll-toggle">
+            <h2 class="work-title">角色&场景设定集</h2>
+            <p class="work-desc">围绕动画世界观设计飞船机甲、外星文明角色及宇宙场景，兼顾硬核科技感与视觉辨识度，色彩以深空蓝、金属灰为主，细节融入未来科技元素。</p>
+            <span class="work-tag">角色设计</span>
+            <span class="work-tag">场景概念</span>
+            <span class="work-tag">科技风</span>
+        </div>
+        <div class="work-right scroll-toggle fade-scale">
+            <div class="work-img">
+                <img src="https://picsum.photos/id/180/800/400" alt="角色场景设定集">
+            </div>
+        </div>
+    </section>
+
+    <!-- 留白过渡 -->
+    <div class="space-gap"></div>
+
+    <!-- 底部全黑联系区 -->
+    <section class="footer-contact" id="contact">
+        <div class="contact-text" id="contactArea">
+            <h3>CONTACT ME & SOCIAL PLATFORMS</h3>
+            <p>EMAIL · bandi268art@xxx.com</p>
+            <p>INSTAGRAM · @bandi268Art</p>
+            <p>BEHANCE · bandi268Art Portfolio</p>
+            <p style="margin-top:20px;">邮箱 · bandicn87@gmail.com  241778452@qq.com | 抖音 · @Bandi268Art</p>
+        </div>
+    </section>
+
+    <script>
+        // 核心逻辑：滚轮往复触发（出现/消失/再出现）
+        function handleScrollToggle() {
+            // 1. 处理所有往复渐变元素
+            const toggleItems = document.querySelectorAll('.scroll-toggle');
+            toggleItems.forEach(item => {
+                const rect = item.getBoundingClientRect();
+                // 元素进入视口75%则显示，完全离开则隐藏
+                if (rect.top <= window.innerHeight * 0.75 && rect.bottom >= window.innerHeight * 0.25) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+
+            // 2. 处理底部联系区（同样往复渐变）
+            const contactText = document.getElementById('contactArea');
+            const contactRect = contactText.getBoundingClientRect();
+            if (contactRect.top <= window.innerHeight * 0.75 && contactRect.bottom >= window.innerHeight * 0.25) {
+                contactText.classList.add('active');
+            } else {
+                contactText.classList.remove('active');
+            }
+        }
+
+        // 实时监听滚轮滚动，实现往复效果
+        window.addEventListener('scroll', handleScrollToggle);
+        // 页面加载时初始化检查
+        window.addEventListener('load', handleScrollToggle);
+    </script>
+</body>
+</html>
