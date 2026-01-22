@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BANDI268 | Narrative Art Portfolio</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Helvetica Neue',Arial,sans-serif;scroll-behavior:smooth;overflow-x:hidden;background:#fff;}
+
+        /* 顶部导航栏 */
+        .navbar{position:fixed;top:0;left:0;width:100%;height:80px;background:rgba(255,255,255,0.95);z-index:999;display:flex;align-items:center;justify-content:space-between;padding:0 5%;box-shadow:0 2px 10px rgba(0,0,0,0.05);}
+        .navbar-logo{font-size:22px;color:#222;letter-spacing:2px;font-weight:400;}
+        .navbar-menu{display:flex;gap:30px;align-items:center;}
+        .navbar-menu a{text-decoration:none;color:#555;letter-spacing:1px;font-size:14px;transition:color 0.3s ease;}
+        .navbar-menu a:hover{color:#2c3e50;}
+        /* 调整后的ANIMATION按钮样式 - 更协调无违和感 */
+        .nav-btn{
+            padding: 6px 16px; /* 缩小内边距，匹配导航文字高度 */
+            background-color: #2c3e50;
+            color: #fff !important;
+            border-radius: 20px; /* 圆润边角，弱化按钮突兀感 */
+            font-size: 14px; /* 和导航文字字号统一 */
+            letter-spacing: 1px; /* 统一字间距 */
+            transition: all 0.3s ease;
+            border: none;
+            display: inline-block;
+        }
+        .nav-btn:hover{
+            background-color: #34495e;
+            transform: translateY(-1px); /* 减小上浮幅度，更柔和 */
+            box-shadow: 0 2px 8px rgba(44, 62, 80, 0.1); /* 弱化阴影 */
+        }
+
+        /* 滚动渐变动画 */
+        .scroll-toggle{opacity:0;transform:translateY(60px);transition:all 1.2s cubic-bezier(0.4,0,0.2,1);}
+        .fade-left{transform:translateX(-60px);}
+        .fade-right{transform:translateX(60px);}
+        .fade-scale{transform:scale(0.9);}
+        .scroll-toggle.active{opacity:1;transform:translate(0);}
+        .fade-scale.active{opacity:1;transform:scale(1);}
+
+        /* 顶部封面区 */
+        .hero-section{width:100%;height:100vh;display:flex;align-items:center;justify-content:center;padding:0 5%;background:#fafafa;position:relative;margin-top:80px;}
+        .hero-content{text-align:center;z-index:2;}
+        .hero-content h1{font-size:48px;color:#222;letter-spacing:2px;margin-bottom:20px;}
+        .hero-content p{font-size:18px;color:#666;max-width:800px;margin:0 auto;line-height:1.8;}
+        .dot-decor{position:absolute;top:20%;right:10%;width:12px;height:12px;background:#e0e0e0;border-radius:50%;}
+        .dot-decor:nth-child(2){top:40%;left:8%;width:8px;height:8px;}
+        .dot-decor:nth-child(3){bottom:30%;right:15%;width:10px;height:10px;}
+
+        /* 全屏大图区块 */
+        .full-img-section{width:100%;height:100vh;background-position:center;background-size:cover;background-attachment:fixed;display:flex;align-items:center;justify-content:center;position:relative;}
+        .section-mask{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.45);z-index:1;}
+        .text-container{position:relative;z-index:2;text-align:center;padding:0 5%;max-width:900px;color:#fff;}
+        .text-container h2{font-size:28px;font-weight:400;letter-spacing:3px;margin-bottom:18px;}
+        .text-container p{font-size:16px;letter-spacing:1.5px;line-height:1.8;opacity:0.9;}
+
+        /* 作品展示区 */
+        .work-section{width:100%;min-height:90vh;display:flex;align-items:center;padding:80px 5%;background:#fff;}
+        .work-left{width:55%;padding-right:5%;}
+        .work-right{width:45%;}
+        .work-reverse{flex-direction:row-reverse;}
+        .work-reverse .work-left{padding-right:0;padding-left:5%;}
+        .work-title{font-size:32px;color:#333;margin-bottom:30px;position:relative;}
+        .work-title::after{content:'';display:block;width:60px;height:3px;background:#2c3e50;margin-top:10px;}
+        .work-desc{font-size:16px;color:#555;line-height:2.0;margin-bottom:25px;}
+        .work-tag{display:inline-block;padding:8px 18px;background:#f5f5f5;color:#444;border-radius:30px;margin-right:12px;margin-bottom:15px;font-size:14px;}
+        .work-img{width:100%;height:400px;border-radius:8px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,0.08);background:#f8f8f8;display:flex;align-items:center;justify-content:center;}
+        .work-img img{width:100%;height:100%;object-fit:cover;opacity:0.8;transition:opacity 0.5s ease;}
+        .work-img:hover img{opacity:1;}
+
+        /* 过渡区 */
+        .space-section{width:100%;height:30vh;background:#fafafa;}
+        .space-gap{width:100%;height:40vh;background:#000;}
+
+        /* 联系区 */
+        .footer-contact{width:100%;height:100vh;background:#000;display:flex;align-items:center;justify-content:center;position:relative;}
+        .contact-text{text-align:center;opacity:0;transform:translateY(40px);transition:opacity 2.5s ease-out, transform 2.5s ease-out;letter-spacing:2px;color:#fff;}
+        .contact-text.active{opacity:1;transform:translateY(0);}
+        .contact-text h3{font-size:24px;font-weight:300;margin-bottom:25px;}
+        .contact-text p{font-size:16px;margin:8px 0;opacity:0.85;}
+
+        /* ========== 动画区 增强设计感 核心修改 ========== */
+        #animationPageContainer{
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); /* 渐变背景替代纯色 */
+            z-index: 9999;
+            overflow-y: auto;
+            padding-top: 80px;
+            color: #fff;
+        }
+        /* 动画区导航栏 - 增强质感 */
+        .animation-page-navbar{
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background: rgba(15, 23, 42, 0.8); /* 半透明磨砂感 */
+            backdrop-filter: blur(10px); /* 毛玻璃效果 */
+            z-index: 99999;
+            display: flex;
+            align-items:center;
+            justify-content: space-between;
+            padding: 0 5%;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1); /* 细边框分隔 */
+        }
+        .animation-page-logo{
+            font-size:24px;
+            color: #fff;
+            letter-spacing: 3px;
+            font-weight: 600;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, #38bdf8, #818cf8, #c084fc); /* 渐变文字升级 */
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+        }
+        .animation-page-logo::after{
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #38bdf8, #818cf8, #c084fc); /* 渐变下划线 */
+            border-radius: 2px;
+            opacity: 0.7;
+            animation: glow 3s ease-in-out infinite;
+        }
+        @keyframes glow {
+            0%, 100% { opacity: 0.5; width: 50%; }
+            50% { opacity: 1; width: 100%; }
+        }
+        .animation-page-menu{display:flex;gap:30px;align-items:center;}
+        .animation-page-menu a{text-decoration:none;color:#94a3b8;letter-spacing:1px;font-size:14px;transition:all 0.3s ease;}
+        .animation-page-menu a:hover{color:#fff;}
+        .back-btn{
+            padding: 8px 20px;
+            background: linear-gradient(90deg, #38bdf8, #818cf8); /* 清新渐变替代红黑 */
+            color: #fff !important;
+            border-radius: 8px; /* 圆润边角 */
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2); /* 柔和光晕 */
+            border: none;
+        }
+        .back-btn:hover{
+            background: linear-gradient(90deg, #2563eb, #4f46e5); /* hover加深渐变 */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(56, 189, 248, 0.3);
+        }
+        /* 轮播区 - 移除背景图，保留结构，替换为渐变背景 */
+        .carousel-section{
+            width: 100%;
+            height: 400px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 60px; /* 增加底部间距 */
+            border-radius: 16px; /* 圆角设计 */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); /* 立体阴影 */
+            background: linear-gradient(135deg, #1e293b, #0f172a); /* 替换为渐变背景 */
+        }
+        .carousel-slide{
+            width: 100%;
+            height: 100%;
+            position: relative;
+            /* 已删除背景图属性 */
+        }
+        .carousel-mask{
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 60%;
+            background: linear-gradient(to top, #0f172a 0%, transparent 100%); /* 渐变蒙版更自然 */
+        }
+        .carousel-content{
+            position: absolute;
+            bottom: 60px;
+            left: 5%;
+            z-index: 2;
+            max-width: 600px;
+        }
+        .carousel-title{
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            line-height: 1.2;
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3); /* 文字阴影增强可读性 */
+        }
+        .carousel-desc{
+            font-size: 16px;
+            line-height: 1.6;
+            color: #e2e8f0;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+        .carousel-btn{
+            padding: 10px 25px;
+            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            margin-right: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2);
+        }
+        .carousel-btn:hover{
+            background: linear-gradient(90deg, #2563eb, #4f46e5);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(56, 189, 248, 0.3);
+        }
+        .carousel-btn-secondary{
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+        }
+        .carousel-btn-secondary:hover{
+            background: rgba(255,255,255,0.2);
+            box-shadow: none;
+        }
+        /* 视频列表区 - 卡片升级 */
+        .category-section{
+            padding: 0 5% 60px;
+        }
+        .category-title{
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: #e2e8f0;
+            line-height: 1.2;
+            position: relative;
+            padding-left: 12px;
+        }
+        .category-title::before{
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 16px;
+            background: linear-gradient(180deg, #38bdf8, #818cf8);
+            border-radius: 2px;
+        }
+        .video-list{
+            display: flex;
+            gap: 25px;
+            overflow-x: auto;
+            padding-bottom: 15px;
+            scrollbar-width: thin;
+            scrollbar-color: #475569 #0f172a;
+        }
+        .video-list::-webkit-scrollbar{
+            height: 6px;
+        }
+        .video-list::-webkit-scrollbar-track{
+            background: #0f172a;
+            border-radius: 3px;
+        }
+        .video-list::-webkit-scrollbar-thumb{
+            background: #475569;
+            border-radius: 3px;
+        }
+        .video-card{
+            min-width: 280px; /* 加宽卡片 */
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+        .video-card:hover{
+            transform: translateY(-8px) scale(1.02);
+            border-color: rgba(56, 189, 248, 0.3);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+        }
+        .video-card-placeholder{ 
+            width: 100%;
+            height: 160px; /* 加高封面区 */
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #94a3b8;
+            font-size: 14px;
+            letter-spacing: 1px;
+            position: relative;
+        }
+        .video-card-placeholder::after{
+            content: '▶';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 32px;
+            color: rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+        .video-card:hover .video-card-placeholder::after{
+            color: rgba(56, 189, 248, 0.6);
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+        .video-card-info{
+            padding: 16px;
+            background: rgba(30, 41, 59, 0.8);
+        }
+        .video-card-title{
+            font-size: 14px;
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #e2e8f0;
+        }
+        .video-card-desc{
+            font-size: 12px;
+            color: #94a3b8;
+            display: flex;
+            justify-content: space-between;
+        }
+        /* ========== 动画区 修改结束 ========== */
+
+        /* 响应式适配 */
+        @media (max-width:1024px){
+            .navbar{height:70px;}
+            .hero-section{margin-top:70px;}
+            .hero-content h1{font-size:38px;}
+            .work-section{flex-direction:column;min-height:auto;padding:60px 5%;}
+            .work-left, .work-right{width:100%;padding:0 !important;margin-bottom:30px;}
+            .work-img{height:300px;}
+            .work-title{font-size:28px;}
+            .navbar-menu{gap:20px;}
+            .nav-btn{padding: 5px 14px;font-size:12px;border-radius:18px;}
+            
+            .carousel-section{height: 300px;}
+            .carousel-title{font-size: 28px;}
+            .animation-page-navbar{height:70px;}
+            .animation-page-logo{font-size:20px;}
+            .animation-page-menu{gap:20px;}
+            .back-btn{padding: 6px 16px;font-size:12px;}
+            #animationPageContainer{padding-top:70px;}
+            .video-card{min-width: 240px;}
+            .video-card-placeholder{height: 130px;}
+        }
+        @media (max-width:768px){
+            .navbar{height:60px;}
+            .hero-section{margin-top:60px;}
+            .hero-content h1{font-size:32px;}
+            .hero-content p{font-size:16px;}
+            .text-container h2{font-size:18px;}
+            .text-container p{font-size:12px;}
+            .work-title{font-size:24px;}
+            .work-desc{font-size:14px;}
+            .contact-text h3{font-size:18px;}
+            .contact-text p{font-size:12px;}
+            .full-img-section{background-attachment:scroll;}
+            .navbar-menu{gap:15px;}
+            .navbar-menu a{font-size:12px;}
+            .navbar-logo{font-size:18px;}
+            .nav-btn{padding: 4px 12px;font-size:11px;border-radius:16px;}
+            
+            .animation-page-navbar{height:60px;}
+            .animation-page-logo{font-size:18px;}
+            .animation-page-menu{gap:15px;}
+            .animation-page-menu a{font-size:12px;}
+            .back-btn{padding: 5px 12px;font-size:11px;}
+            #animationPageContainer{padding-top:60px;}
+            .carousel-section{height: 200px;}
+            .carousel-title{font-size: 20px;}
+            .carousel-desc{font-size: 14px;display: none;}
+            .carousel-btn{padding: 8px 15px;font-size: 14px;}
+            .video-card{min-width: 180px;}
+            .video-card-placeholder{height: 100px;}
+        }
+
+        /* 背景图配置 */
+        .section1{background-image:url(https://s41.ax1x.com/2026/01/18/pZyAcsx.jpg);}
+        .section2{background-image:url(https://s41.ax1x.com/2026/01/18/pZyZbO1.jpg);}
+    </style>
+</head>
+<body>
+    <!-- 顶部导航栏 - 完全未动 -->
+    <nav class="navbar">
+        <div class="navbar-logo">BANDI268 ART</div>
+        <div class="navbar-menu">
+            <a href="#hero">HOME | 首页</a>
+            <a href="#work1">WORK 01 | 作品一</a>
+            <a href="#work2">WORK 02 | 作品二</a>
+            <a href="#contact">CONTACT | 联系</a>
+            <a href="javascript:void(0);" class="nav-btn" onclick="showAnimationPage()">ANIMATION | 动画</a>
+        </div>
+    </nav>
+
+    <!-- 顶部封面区 - 完全未动 -->
+    <section class="hero-section" id="hero">
+        <div class="dot-decor"></div>
+        <div class="dot-decor"></div>
+        <div class="dot-decor"></div>
+        <div class="hero-content scroll-toggle">
+            <h1>BANDI's Exquisite Art Portfolio</h1>
+ 	    <h1>作品</h1>
+            <p>聚焦动画与视觉设计，探索创作与社交的边界，用镜头与色彩传递世界观</p>
+	    <p>Focus on animation and visual design, explore the boundaries between creation and social interaction, and convey worldviews through lenses and colors.</p>
+        </div>
+    </section>
+
+    <!-- 全屏大图区1 - 完全未动 -->
+    <section class="full-img-section section1">
+        <div class="section-mask"></div>
+        <div class="text-container scroll-toggle">
+            <h2>BANDI PORTFOLIO</h2>
+            <p>ANCIENT CHINESE STYLE ART & ILLUSTRATION</p>
+        </div>
+    </section>
+
+    <!-- 作品区1 - 完全未动 -->
+    <section class="work-section" id="work1">
+        <div class="work-left scroll-toggle">
+            <h2 class="work-title">个人动画短片 · 全流程创作</h2>
+            <p class="work-desc">以练习和探索为目的，尝试构建完整的世界观，从分镜脚本到原画绘制、动态分镜，全程用CSP软件打磨画面质感，强化镜头叙事节奏与沉浸感。</p>
+            <span class="work-tag">CSP制作</span>
+            <span class="work-tag">自由题材</span>
+            <span class="work-tag">全流程</span>
+        </div>
+        <div class="work-right scroll-toggle fade-left">
+            <div class="work-img">
+                <img src="https://s41.ax1x.com/2026/01/18/pZyVIKI.png" alt="科幻动画短片封面">
+            </div>
+        </div>
+    </section>
+
+    <!-- 过渡区 - 完全未动 -->
+    <section class="space-section"></section>
+
+    <!-- 全屏大图区2 - 完全未动 -->
+    <section class="full-img-section section2">
+        <div class="section-mask"></div>
+        <div class="text-container scroll-toggle fade-right">
+            <h2>CHARACTER & SCENE DESIGN</h2>
+            <p>EARLY WORKS, UNVEILING PAINTING'S MYSTERIES · STEP BY STEP
+/ 每一幅作品，都在逐步探寻绘画技巧</p>
+        </div>
+    </section>
+
+    <!-- 作品区2 - 完全未动 -->
+    <section class="work-section work-reverse" id="work2">
+        <div class="work-left scroll-toggle">
+            <h2 class="work-title">角色&场景的练习与借鉴</h2>
+            <p class="work-desc">画风尝试围绕画师 · 信譞666k、角色身上的笔触及场景物体的笔触，主要增加视觉辨识度，色彩以蓝为主、尝试高对比度色调，细节融入现代古风元素。</p>
+            <span class="work-tag">角色设计</span>
+            <span class="work-tag">场景概念</span>
+            <span class="work-tag">潮流风</span>
+        </div>
+        <div class="work-right scroll-toggle fade-scale">
+            <div class="work-img">
+                <img src="https://s41.ax1x.com/2026/01/18/pZyZxYD.jpg" alt="角色场景设定集">
+            </div>
+        </div>
+    </section>
+
+    <!-- 过渡区 - 完全未动 -->
+    <div class="space-gap"></div>
+
+    <!-- 联系区 - 完全未动 -->
+    <section class="footer-contact" id="contact">
+        <div class="contact-text" id="contactArea">
+            <h3>CONTACT ME & SOCIAL PLATFORMS</h3>
+	    <h1>联系我 & 社交平台</h1><br><br>
+            <div style="text-align: center; padding: 1.5rem 0; font-family: 'Inter', sans-serif; color: #555; font-size: 0.85rem;">
+  <p style="margin-bottom: 1rem; font-weight: 600; color: #222;">CONTACT & SOCIAL · 联系与社交</p>
+  <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem 2rem; margin-bottom: 1.5rem;">
+    <span>📧 GMAIL: bandicn87@gmail.com</span>
+    <span>✉️ QQ MAIL: 241778452@qq.com</span>
+    <span>🎨 BEHANCE: bandi268Art</span>
+    <span>𝕏 X: @bandi268888</span>
+    <span>🎵 TIKTOK: bandi268Art</span>
+    <span>▶️ YOUTUBE: @bandi268 CN</span>
+    <span>📸 INSTAGRAM: @bandi26836</span>
+  </div>
+  <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem 2rem; color: #777;">
+    <span>谷歌邮箱: bandicn87@gmail.com</span>
+    <span>QQ邮箱: 241778452@qq.com</span>
+    <span>创意平台: bandi268Art</span>
+    <span>推特: @bandi268888</span>
+    <span>抖音: @bandi268Art</span>
+    <span>油管: @bandi268 CN</span>
+    <span>照片墙: @bandi26836</span>
+  </div>
+  <p style="margin-top: 1.5rem; color: #999; font-size: 0.75rem;">© 2026 BANDI · ALL RIGHTS RESERVED / © 2026 班迪 · 版权所有</p>
+</div>
+        </div>
+    </section>
+
+    <!-- 动画页面容器 - 仅删除轮播图背景，保留完整结构 -->
+    <div id="animationPageContainer">
+        <div class="animation-page-navbar">
+            <div class="animation-page-logo">BANDI268 ANIMATION GALLERY</div>
+            <div class="animation-page-menu">
+                <a href="javascript:void(0);" class="back-btn" onclick="hideAnimationPage()">BACK TO HOME | 返回主页</a>
+            </div>
+        </div>
+        
+        <div class="animation-page-content">
+            <div class="carousel-section">
+                <div class="carousel-slide">
+                    <div class="carousel-mask"></div>
+                    <div class="carousel-content">
+                        <h2 class="carousel-title">SELECTED ANIMATION WORKS<br>精选动画作品</h2>
+                        <p class="carousel-desc">A collection of personally created high-quality animation shorts, character animations, scene animations and other works, showing the whole process of animation creation and visual expression.<br>汇集个人创作的优质动画短片、角色动画、场景动画等作品，展现动画创作的全流程与视觉表达。</p>
+                        <button class="carousel-btn">PLAY NOW | 立即播放</button>
+                        <button class="carousel-btn carousel-btn-secondary">MORE DETAILS | 更多详情</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category-section">
+                <h3 class="category-title">MY ANIMATION WORKS | 我的动画作品</h3>
+                <div class="video-list">
+                    <div class="video-card">
+                        <div class="video-card-placeholder">ANIMATION COVER | 动画封面</div>
+                        <div class="video-card-info">
+                            <h4 class="video-card-title">Sci-Fi Animation - Star Trek | 科幻动画短片 - 星际漫游</h4>
+                            <p class="video-card-desc">CSP Full Process | 3 mins | CSP全流程创作 | 3分钟</p>
+                        </div>
+                    </div>
+                    <div class="video-card">
+                        <div class="video-card-placeholder">ANIMATION COVER | 动画封面</div>
+                        <div class="video-card-info">
+                            <h4 class="video-card-title">Ancient Style Animation - Jianghu | 古风角色动画 - 江湖行</h4>
+                            <p class="video-card-desc">Character Design | 2 mins | 角色设计 | 2分钟</p>
+                        </div>
+                    </div>
+                    <div class="video-card">
+                        <div class="video-card-placeholder">ANIMATION COVER | 动画封面</div>
+                        <div class="video-card-info">
+                            <h4 class="video-card-title">Scene Animation - Ancient City | 场景动画 - 古城暮色</h4>
+                            <p class="video-card-desc">Scene Concept | 1.5 mins | 场景概念 | 1.5分钟</p>
+                        </div>
+                    </div>
+                    <div class="video-card">
+                        <div class="video-card-placeholder">ANIMATION COVER | 动画封面</div>
+                        <div class="video-card-info">
+                            <h4 class="video-card-title">Dynamic Storyboard - Adventure | 动态分镜 - 冒险之旅</h4>
+                            <p class="video-card-desc">Storyboard Design | 2.5 mins | 分镜设计 | 2.5分钟</p>
+                        </div>
+                    </div>
+                    <div class="video-card">
+                        <div class="video-card-placeholder">ANIMATION COVER | 动画封面</div>
+                        <div class="video-card-info">
+                            <h4 class="video-card-title">Action Design - Martial Arts | 角色动作设计 - 武打片段</h4>
+                            <p class="video-card-desc">Action Design | 1 min | 动作设计 | 1分钟</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category-section">
+                <h3 class="category-title">COLLECTION REFERENCE ANIMATIONS | 收藏参考动画</h3>
+                <div class="video-list">
+                    <div class="video-card">
+                        <div class="video-card-placeholder">REFERENCE COVER | 参考封面</div>
+                        <div class="video-card-info">
+                            <h4 class="video-card-title">Japanese Animation Storyboard | 日式动画分镜参考</h4>
+                            <p class="video-card-desc">Study Reference | 5 mins | 学习参考 | 5分钟</p>
+                        </div>
+                    </div>
+                    <div class="video-card">
+                        <div class="video-card-placeholder">REFERENCE COVER | 参考封面</div>
+                        <div class="video-card-info">
+                            <h4 class="video-card-title">American Animation Action | 美式动画动作参考</h4>
+                            <p class="video-card-desc">Study Reference | 4 mins | 学习参考 | 4分钟</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="animation-extend-area"></div>
+        </div>
+    </div>
+
+    <script>
+        // 滚动渐变逻辑 - 完全未动
+        function handleScrollToggle() {
+            const toggleItems = document.querySelectorAll('.scroll-toggle');
+            toggleItems.forEach(item => {
+                const rect = item.getBoundingClientRect();
+                if (rect.top <= window.innerHeight * 0.75 && rect.bottom >= window.innerHeight * 0.25) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+
+            const contactText = document.getElementById('contactArea');
+            const contactRect = contactText.getBoundingClientRect();
+            if (contactRect.top <= window.innerHeight * 0.75 && contactRect.bottom >= window.innerHeight * 0.25) {
+                contactText.classList.add('active');
+            } else {
+                contactText.classList.remove('active');
+            }
+        }
+
+        window.addEventListener('scroll', handleScrollToggle);
+        window.addEventListener('load', handleScrollToggle);
+
+        // 动画页面控制 - 完全未动
+        function showAnimationPage() {
+            document.getElementById('animationPageContainer').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            initAnimationPage();
+        }
+
+        function hideAnimationPage() {
+            document.getElementById('animationPageContainer').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function initAnimationPage() {
+            console.log('动画页面已加载');        }
+
+        function playVideo(videoId) {
+            console.log(`播放视频ID: ${videoId}`);
+        }
+
+        function filterCategory(category) {
+            console.log(`筛选分类: ${category}`);
+        }
+    </script>
+</body>
+</html>
